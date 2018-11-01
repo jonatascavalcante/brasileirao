@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Campeonato Brasileiro 2018</title>
+    <meta name="description" content="Campeonato Brasileiro 2018">
+    <meta name="author" content="Jonatas Cavalcante">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.11/lodash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.min.js"></script>
+    <style>
+      
+      body {
+        font-family: "Lato", sans-serif;
+      }
+
+      .sidenav {
+        height: 100%;
+        width: 30%;
+        position: fixed;
+        z-index: 1;
+        top: 0;
+        left: 0;
+        background-color: #243846;
+        overflow-x: hidden;
+        padding-top: 10px;
+        color: #fff;
+        font-size: 12px;
+      }
+
+      .main {
+        margin-left: 30%;
+        padding: 0px 10px;
+      }
+
+      table {
+        border: 1px solid white;
+        font-size: 15px;
+        text-align: center
+      }
+
+      th {
+        padding-left: 5px;
+        padding-right: 5px;
+        border-bottom: 1px solid white
+      }
+
+      .visualizacoes {
+        font-size: 15px
+      }
+
+      canvas {
+        position: absolute;
+        left: 30%;
+        top: 0;
+      }
+
+      li {
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <script>
+      const data = [
+              {
+                "position": 1,
+                "team": "São Paulo",
+                "P": 42,
+                "J": 20,
+                "V": 12,
+                "E": 6,
+                "D": 2,
+                "GP": 33,
+                "GC": 17,
+                "SG": 16,
+                "percent": 70
+              },
+              {
+                "position": 2,
+                "team": "Internacional",
+                "P": 41,
+                "J": 20,
+                "V": 12,
+                "E": 5,
+                "D": 3,
+                "GP": 28,
+                "GC": 12,
+                "SG": 16,
+                "percent": 68.3
+              },
+              {
+                "position": 3,
+                "team": "Flamengo",
+                "P": 40,
+                "J": 20,
+                "V": 12,
+                "E": 4,
+                "D": 4,
+                "GP": 30,
+                "GC": 15,
+                "SG": 15,
+                "percent": 66.7
+              },
+              {
+                "position": 4,
+                "team": "Grêmio",
+                "P": 37,
+                "J": 20,
+                "V": 10,
+                "E": 7,
+                "D": 3,
+                "GP": 24,
+                "GC": 9,
+                "SG": 15,
+                "percent": 61.7
+              },
+              {
+                "position": 5,
+                "team": "Palmeiras",
+                "P": 36,
+                "J": 20,
+                "V": 10,
+                "E": 6,
+                "D": 4,
+                "GP": 31,
+                "GC": 15,
+                "SG": 16,
+                "percent": 60
+              },
+              {
+                "position": 6,
+                "team": "Atlético-MG",
+                "P": 34,
+                "J": 20,
+                "V": 10,
+                "E": 4,
+                "D": 6,
+                "GP": 36,
+                "GC": 26,
+                "SG": 10,
+                "percent": 56.7
+              },
+              {
+                "position": 7,
+                "team": "Cruzeiro",
+                "P": 27,
+                "J": 20,
+                "V": 7,
+                "E": 6,
+                "D": 7,
+                "GP": 16,
+                "GC": 17,
+                "SG": -1,
+                "percent": 45
+              },
+              {
+                "position": 8,
+                "team": "Corinthians",
+                "P": 26,
+                "J": 20,
+                "V": 7,
+                "E": 5,
+                "D": 8,
+                "GP": 22,
+                "GC": 17,
+                "SG": 5,
+                "percent": 43.3
+              },
+              {
+                "position": 9,
+                "team": "Fluminense",
+                "P": 26,
+                "J": 20,
+                "V": 7,
+                "E": 5,
+                "D": 8,
+                "GP": 20,
+                "GC": 24,
+                "SG": -4,
+                "percent": 43.3
+              },
+              {
+                "position": 10,
+                "team": "América-MG",
+                "P": 25,
+                "J": 20,
+                "V": 7,
+                "E": 4,
+                "D": 9,
+                "GP": 20,
+                "GC": 24,
+                "SG": -4,
+                "percent": 41.7
+              },
+              {
+                "position": 11,
+                "team": "Bahia",
+                "P": 22,
+                "J": 19,
+                "V": 5,
+                "E": 7,
+                "D": 7,
+                "GP": 20,
+                "GC": 24,
+                "SG": -4,
+                "percent": 38.6
+              },
+              {
+                "position": 12,
+                "team": "Botafogo",
+                "P": 22,
+                "J": 20,
+                "V": 5,
+                "E": 7,
+                "D": 8,
+                "GP": 18,
+                "GC": 27,
+                "SG": -9,
+                "percent": 36.7
+              },
+              {
+                "position": 13,
+                "team": "Santos",
+                "P": 21,
+                "J": 19,
+                "V": 5,
+                "E": 6,
+                "D": 8,
+                "GP": 21,
+                "GC": 23,
+                "SG": -2,
+                "percent": 36.8
+              },
+              {
+                "position": 14,
+                "team": "Vasco",
+                "P": 21,
+                "J": 18,
+                "V": 5,
+                "E": 6,
+                "D": 7,
+                "GP": 22,
+                "GC": 27,
+                "SG": -5,
+                "percent": 38.9
+              },
+              {
+                "position": 15,
+                "team": "Chapecoense",
+                "P": 21,
+                "J": 19,
+                "V": 4,
+                "E": 9,
+                "D": 6,
+                "GP": 19,
+                "GC": 26,
+                "SG": -7,
+                "percent": 36.8
+              },
+              {
+                "position": 16,
+                "team": "Sport",
+                "P": 20,
+                "J": 20,
+                "V": 5,
+                "E": 5,
+                "D": 10,
+                "GP": 19,
+                "GC": 32,
+                "SG": -13,
+                "percent": 33.3
+              },
+              {
+                "position": 17,
+                "team": "Vitória",
+                "P": 19,
+                "J": 20,
+                "V": 5,
+                "E": 4,
+                "D": 11,
+                "GP": 20,
+                "GC": 40,
+                "SG": -20,
+                "percent": 31.7
+              },
+              {
+                "position": 18,
+                "team": "Atlético-PR",
+                "P": 18,
+                "J": 18,
+                "V": 4,
+                "E": 6,
+                "D": 8,
+                "GP": 20,
+                "GC": 19,
+                "SG": 1,
+                "percent": 33.3
+              },
+              {
+                "position": 19,
+                "team": "Ceará",
+                "P": 17,
+                "J": 19,
+                "V": 3,
+                "E": 8,
+                "D": 8,
+                "GP": 12,
+                "GC": 21,
+                "SG": -9,
+                "percent": 29.8
+              },
+              {
+                "position": 20,
+                "team": "Paraná",
+                "P": 15,
+                "J": 20,
+                "V": 3,
+                "E": 6,
+                "D": 11,
+                "GP": 10,
+                "GC": 26,
+                "SG": -16,
+                "percent": 25
+              }
+      ];
+
+      document.addEventListener('DOMContentLoaded', () => {
+        var table = document.getElementById('tabela_times');
+        var tbdy = document.createElement('tbody');
+                
+        // Creates table structure
+        _.map(data, function(team) {
+          var tr = document.createElement('tr');
+          var tdPosition = document.createElement('td');
+          tdPosition.appendChild(document.createTextNode(team.position));
+          tr.appendChild(tdPosition);
+          var tdTeam = document.createElement('td');
+          tdTeam.appendChild(document.createTextNode(team.team));
+          tr.appendChild(tdTeam);
+          var tdP = document.createElement('td');
+          tdP.appendChild(document.createTextNode(team.P));
+          tr.appendChild(tdP);
+          var tdJ = document.createElement('td');
+          tdJ.appendChild(document.createTextNode(team.J));
+          tr.appendChild(tdJ);
+          var tdV = document.createElement('td');
+          tdV.appendChild(document.createTextNode(team.V));
+          tr.appendChild(tdV);
+          var tdE = document.createElement('td');
+          tdE.appendChild(document.createTextNode(team.E));
+          tr.appendChild(tdE);
+          var tdD = document.createElement('td');
+          tdD.appendChild(document.createTextNode(team.D));
+          tr.appendChild(tdD);
+          var tdGP = document.createElement('td');
+          tdGP.appendChild(document.createTextNode(team.GP));
+          tr.appendChild(tdGP);
+          var tdGC = document.createElement('td');
+          tdGC.appendChild(document.createTextNode(team.GC));
+          tr.appendChild(tdGC);
+          var tdSG = document.createElement('td');
+          tdSG.appendChild(document.createTextNode(team.SG));
+          tr.appendChild(tdSG);
+          var tdPercent = document.createElement('td');
+          tdPercent.appendChild(document.createTextNode(team.percent));
+          tr.appendChild(tdPercent);
+          tbdy.appendChild(tr);
+        });
+        table.appendChild(tbdy);
+      });
+
+      function vitoriasDerrotas(){
+        const chart = document.getElementById('vitoriasDerrotas');
+
+        labels = [];
+        vitorias = [];
+        derrotas = []
+
+        //Hide the other canvas
+        var golsParaGolsContra = document.getElementById('golsParaGolsContra');
+        var saldoAproveitamento = document.getElementById('saldoAproveitamento');
+
+        golsParaGolsContra.style.visibility='hidden';
+        saldoAproveitamento.style.visibility='hidden';
+
+        //Get the current canvas data
+        _.map(data, function(team) {
+          labels.push(team.team);
+          vitorias.push(team.V);
+          derrotas.push(team.D);
+        });
+
+        grafico = new Chart(chart, {
+          type: 'horizontalBar',
+          data: {
+            labels: labels,
+            datasets: [
+            {
+              label: 'Vitórias',
+              data: vitorias,
+              backgroundColor: '#008080'
+            },
+            {
+              label: 'Derrotas',
+              data: derrotas,
+              backgroundColor: '#f05858'
+            }]
+          },
+          options: {
+            title: {
+              display: true,
+              text: 'Relação de Vitórias x Derrotas'
+            }
+          }
+        });
+        chart.style.visibility='visible';
+      }
+
+      function golsParaGolsContra(){
+        const chart = document.getElementById('golsParaGolsContra');
+
+        labels = [];
+        gols_para = [];
+        gols_contra = []
+
+        //Hide the other canvas
+        var vitoriasDerrotas = document.getElementById('vitoriasDerrotas');
+        var saldoAproveitamento = document.getElementById('saldoAproveitamento');
+
+        vitoriasDerrotas.style.visibility='hidden';
+        saldoAproveitamento.style.visibility='hidden';
+
+        //Get the current canvas data        
+        _.map(data, function(team) {
+          labels.push(team.team);
+          gols_para.push(team.GP);
+          gols_contra.push(team.GC);
+        });
+        
+        grafico = new Chart(chart, {
+          type: 'horizontalBar',
+          data: {
+            labels: labels,
+            datasets: [
+            {
+              label: 'Gols Para',
+              data: gols_para,
+              backgroundColor: '#2d91bd'
+            },
+            {
+              label: 'Gols Contra',
+              data: gols_contra,
+              backgroundColor: '#f05858'
+            }]
+          },
+          options: {
+            title: {
+              display: true,
+              text: 'Relação Gols Para x Gols Contra'
+            }
+          }
+        });
+        chart.style.visibility='visible';
+      }
+
+      function saldoAproveitamento(){
+        const chart = document.getElementById('saldoAproveitamento');
+
+        labels = [];
+        saldoGols = [];
+        aproveitamento = []
+        
+        //Hide the other canvas
+        var vitoriasDerrotas = document.getElementById('vitoriasDerrotas');
+        var golsParaGolsContra = document.getElementById('golsParaGolsContra');
+
+        vitoriasDerrotas.style.visibility='hidden';
+        golsParaGolsContra.style.visibility='hidden';
+
+        //Get the current canvas data 
+        _.map(data, function(team) {
+          labels.push(team.team);
+          saldoGols.push(team.SG);
+          aproveitamento.push(team.percent);
+        });
+        
+        grafico = new Chart(chart, {
+          type: 'horizontalBar',
+          data: {
+            labels: labels,
+            datasets: [
+            {
+              label: 'Saldo de Gols',
+              data: saldoGols,
+              backgroundColor: '#f05858'
+            },
+            {
+              label: '% de Aproveitamento',
+              data: aproveitamento,
+              backgroundColor: '#2d91bd'
+            }]
+          },
+          options: {
+            title: {
+              display: true,
+              text: 'Relação de Saldo de Gols x % de Aproveitamento'
+            }
+          }
+        });
+        chart.style.visibility='visible';
+      }
+
+    </script> 
+    
+    <div class="sidenav">
+      <center><h1>Brasileirão 2018</h1></center>
+      <center><table id="tabela_times">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Time</th>
+            <th>P</th>
+            <th>J</th>
+            <th>V</th>
+            <th>E</th>
+            <th>D</th>
+            <th>GP</th>
+            <th>GC</th>
+            <th>SG</th>
+            <th>%</th>
+          </tr>
+        </thead>
+      </table></center>
+
+      <div class="visualizacoes">
+        <center><p>Selecione uma das visualizações abaixo: </p></center>
+        <ul>
+          <li onclick="vitoriasDerrotas()">Gráfico Vitórias x Derrotas</li>
+          <li onclick="golsParaGolsContra()">Gráfico Gols Para x Gols Contra</li>
+          <li onclick="saldoAproveitamento()">Gráfico Saldo de Gols x % de Aproveitamento</li>
+        </ul>   
+      </div>
+    </div> 
+
+    <div class="main">
+      <canvas id="vitoriasDerrotas" width="100%"></canvas>
+      <canvas id="golsParaGolsContra" width="100%"></canvas>
+      <canvas id="saldoAproveitamento" width="100%"></canvas>
+    </div>    
+</html>
